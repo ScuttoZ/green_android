@@ -56,6 +56,7 @@ import com.blockstream.data.extensions.ifConnected
 import com.blockstream.data.extensions.isNotBlank
 import com.blockstream.data.extensions.logException
 import com.blockstream.data.extensions.objectId
+import com.blockstream.data.extensions.rateLimitErrorCode
 import com.blockstream.data.gdk.GdkSession
 import com.blockstream.data.gdk.TwoFactorResolver
 import com.blockstream.data.gdk.data.Account
@@ -707,6 +708,9 @@ open class GreenViewModel constructor(
 
                 } catch (e: Exception) {
                     if (this.isActive) {
+                        e.rateLimitErrorCode()?.also { code ->
+                            logger.w { "RATE_LIMIT_CHECK: caught GDK rate-limit error code=$code message=${e.message}" }
+                        }
                         countly.recordException(e)
                         postAction?.invoke(e)
                         onError.invoke(e)

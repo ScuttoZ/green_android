@@ -207,6 +207,16 @@ fun Throwable.isNotAuthorized() =
 
 fun Throwable.isConnectionError() = message?.contains("failed to connect") ?: false
 
+// Electrum rate-limit errors surfaced by gdk's rate_limit_error branch
+// (-32002 → id_rate_limited, -32003 → id_rate_connection_limited).
+fun Throwable.rateLimitErrorCode(): String? = message?.let { m ->
+    when {
+        m.contains("id_rate_connection_limited") -> "id_rate_connection_limited"
+        m.contains("id_rate_limited") -> "id_rate_limited"
+        else -> null
+    }
+}
+
 fun String.twoFactorMethodsLocalizedDeprecated(): String = when (this) {
     "phone" -> "id_call"
     "gauth" -> "id_authenticator_app"
